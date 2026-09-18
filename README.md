@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ma Sói Frontend
 
-## Getting Started
+Next.js frontend cho backend NestJS trong thư mục `../werewolf-backend`.
 
-First, run the development server:
+## Chạy local
 
-```bash
+```powershell
+npm install
+Copy-Item .env.local.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Frontend mặc định chạy ở `http://localhost:3001` nếu chạy `npm run dev -- --port 3001`. Backend cần chạy tại `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```powershell
+cd ../werewolf-backend
+npm run db:up
+npm run start:dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Các màn hình
 
-## Learn More
+- Trang chủ: tạo phòng và vào phòng bằng mã phòng. Trong phòng chờ, chủ phòng chọn số lượng từng role cho cả ván rồi lưu cấu hình trước khi bắt đầu; server xáo ngẫu nhiên các role đó khi chia.
+- Trang ván chơi: danh sách người chơi, role/phe riêng, tình nhân, lịch sử soi, nhóm Sói, nhật ký chung và các thao tác theo phase.
+- UI hiển thị role đang có lượt trong đêm cho toàn phòng; panel hành động chỉ mở cho người có quyền thực hiện lượt đó.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`playerId` được lưu trong `localStorage` theo mã phòng. Đây là cơ chế phát triển tương thích backend hiện tại; khi backend có JWT/session, frontend cần thay phần lưu session này bằng token xác thực.
