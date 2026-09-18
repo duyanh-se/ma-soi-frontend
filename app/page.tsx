@@ -42,7 +42,7 @@ export default function Home() {
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-5 py-10 sm:px-8">
       <header className="mb-10 flex items-center justify-between">
         <div className="text-xs font-bold tracking-[0.28em] text-[#eabf65]">LÀNG TRONG RỪNG</div>
-        <a className="text-sm text-[#afc3b6] hover:text-white" href="http://localhost:3000/docs" target="_blank" rel="noreferrer">API Docs</a>
+        <a className="text-sm text-[#afc3b6] hover:text-white" href="/docs" target="_blank" rel="noreferrer">API Docs</a>
       </header>
       <section className="mb-10 max-w-3xl">
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#eabf65]">Quản trò tự động</p>
