@@ -1,70 +1,16 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 
-function saveSession(gameId: string, playerId: string, isHost: boolean) {
-  localStorage.setItem(`werewolf:${gameId}`, JSON.stringify({ playerId, isHost }));
-}
+function saveSession(gameId: string, playerId: string, isHost: boolean) { localStorage.setItem(`werewolf:${gameId}`, JSON.stringify({ playerId, isHost })); }
+function Field({ label, value, onChange, placeholder, maxLength }: { label: string; value: string; onChange: (value: string) => void; placeholder: string; maxLength?: number }) { return <label className="block text-sm font-semibold text-[#edf3e9]"><span>{label}</span><input required value={value} onChange={(event) => onChange(event.target.value)} maxLength={maxLength} placeholder={placeholder} className="mt-2 w-full rounded-2xl border border-white/12 bg-black/20 px-4 py-3.5 text-white outline-none transition placeholder:text-white/30 focus:border-[#e8ba61] focus:bg-black/30 focus:ring-4 focus:ring-[#e8ba61]/10" /></label>; }
 
 export default function Home() {
-  const router = useRouter();
-  const [hostName, setHostName] = useState("");
-  const [joinName, setJoinName] = useState("");
-  const [gameId, setGameId] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function createGame(event: FormEvent) {
-    event.preventDefault();
-    setLoading(true); setError("");
-    try {
-      const room = await api.createGame(hostName);
-      saveSession(room.gameId, room.hostPlayerId, true);
-      router.push(`/game/${room.gameId}`);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Không thể tạo phòng."); }
-    finally { setLoading(false); }
-  }
-
-  async function joinGame(event: FormEvent) {
-    event.preventDefault();
-    setLoading(true); setError("");
-    try {
-      const player = await api.joinGame(gameId.trim(), joinName);
-      saveSession(gameId.trim(), player.playerId, false);
-      router.push(`/game/${gameId.trim()}`);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Không thể vào phòng."); }
-    finally { setLoading(false); }
-  }
-
-  return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-5 py-10 sm:px-8">
-      <header className="mb-10 flex items-center justify-between">
-        <div className="text-xs font-bold tracking-[0.28em] text-[#eabf65]">LÀNG TRONG RỪNG</div>
-        <a className="text-sm text-[#afc3b6] hover:text-white" href="/docs" target="_blank" rel="noreferrer">API Docs</a>
-      </header>
-      <section className="mb-10 max-w-3xl">
-        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#eabf65]">Quản trò tự động</p>
-        <h1 className="text-5xl font-black tracking-tight sm:text-7xl">Ma Sói</h1>
-        <p className="mt-5 max-w-xl text-lg leading-8 text-[#c8d8cc]">Web giữ bí mật vai trò, điều phối lượt đêm/ngày và xử lý luật chơi. Cả làng vẫn thảo luận với nhau ở nơi bạn chọn.</p>
-      </section>
-      <div className="grid gap-6 lg:grid-cols-[1.35fr_0.9fr]">
-        <form onSubmit={createGame} className="rounded-3xl border border-white/10 bg-[#153326]/90 p-6 shadow-2xl sm:p-8">
-          <h2 className="text-2xl font-bold">Tạo một ván mới</h2>
-          <p className="mt-2 text-sm leading-6 text-[#afc3b6]">Mời mọi người vào phòng trước. Sau đó, chủ phòng chọn số lượng từng role cho cả ván; hệ thống sẽ xáo ngẫu nhiên khi chia.</p>
-          <label className="mt-7 block text-sm font-semibold">Tên của bạn<input required value={hostName} onChange={(event) => setHostName(event.target.value)} maxLength={40} placeholder="Ví dụ: An" className="mt-2 w-full rounded-xl border border-white/15 bg-black/20 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#eabf65]" /></label>
-          <button disabled={loading} className="mt-7 w-full rounded-xl bg-[#eabf65] px-4 py-3 font-bold text-[#14291f] transition hover:bg-[#f5d68e] disabled:cursor-not-allowed disabled:opacity-50">{loading ? "Đang tạo..." : "Tạo phòng"}</button>
-        </form>
-        <form onSubmit={joinGame} className="self-start rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
-          <h2 className="text-2xl font-bold">Vào phòng</h2>
-          <p className="mt-2 text-sm leading-6 text-[#afc3b6]">Nhập mã phòng do chủ phòng gửi cho bạn.</p>
-          <label className="mt-7 block text-sm font-semibold">Mã phòng<input required value={gameId} onChange={(event) => setGameId(event.target.value)} placeholder="UUID của phòng" className="mt-2 w-full rounded-xl border border-white/15 bg-black/20 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#eabf65]" /></label>
-          <label className="mt-4 block text-sm font-semibold">Tên của bạn<input required value={joinName} onChange={(event) => setJoinName(event.target.value)} maxLength={40} placeholder="Ví dụ: Bình" className="mt-2 w-full rounded-xl border border-white/15 bg-black/20 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#eabf65]" /></label>
-          <button disabled={loading} className="mt-7 w-full rounded-xl border border-[#eabf65]/70 px-4 py-3 font-bold text-[#f4d990] transition hover:bg-[#eabf65]/10 disabled:cursor-not-allowed disabled:opacity-50">{loading ? "Đang vào..." : "Vào phòng"}</button>
-        </form>
-      </div>
-      {error && <p className="mt-5 rounded-xl border border-red-300/30 bg-red-900/30 px-4 py-3 text-sm text-red-100">{error}</p>}
-    </main>
-  );
+  const router = useRouter(); const [hostName, setHostName] = useState(""); const [joinName, setJoinName] = useState(""); const [gameId, setGameId] = useState(""); const [error, setError] = useState(""); const [loading, setLoading] = useState<"create" | "join" | null>(null);
+  async function createGame(event: FormEvent) { event.preventDefault(); setLoading("create"); setError(""); try { const room = await api.createGame(hostName); saveSession(room.gameId, room.hostPlayerId, true); router.push(`/game/${room.gameId}`); } catch (cause) { setError(cause instanceof Error ? cause.message : "Không thể tạo phòng."); } finally { setLoading(null); } }
+  async function joinGame(event: FormEvent) { event.preventDefault(); setLoading("join"); setError(""); try { const id = gameId.trim(); const player = await api.joinGame(id, joinName); saveSession(id, player.playerId, false); router.push(`/game/${id}`); } catch (cause) { setError(cause instanceof Error ? cause.message : "Không thể vào phòng."); } finally { setLoading(null); } }
+  return <main className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col overflow-hidden px-5 py-6 sm:px-8 sm:py-9"><div className="mist pointer-events-none absolute -left-32 top-44 h-72 w-[42rem] rounded-full bg-emerald-200/8 blur-3xl" /><header className="relative z-10 flex items-center justify-between"><Link className="flex items-center gap-3" href="/"><span className="grid h-10 w-10 place-items-center rounded-full border border-[#e8ba61]/40 bg-[#e8ba61]/10 text-xl">☾</span><span><b className="display-font text-xl tracking-wide text-[#ffe2a1]">Làng trong rừng</b><small className="block text-[10px] font-bold uppercase tracking-[.2em] text-[#a9b6a9]">Ma Sói trực tuyến</small></span></Link><a className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold text-[#cbd6ca] transition hover:border-[#e8ba61]/40 hover:text-[#ffe2a1]" href="/docs" target="_blank" rel="noreferrer">API docs ↗</a></header><section className="relative z-10 grid flex-1 items-center gap-12 py-14 lg:grid-cols-[1.1fr_.9fr] lg:py-20"><div className="rise max-w-2xl"><p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#e8ba61]/25 bg-[#e8ba61]/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[.15em] text-[#ffe2a1]"><span className="h-1.5 w-1.5 rounded-full bg-[#e8ba61]" />Quản trò tự động</p><h1 className="display-font text-6xl font-bold leading-[.9] tracking-tight text-[#f8f2e5] sm:text-7xl lg:text-8xl">Đêm xuống,<br /><i className="font-normal text-[#e8ba61]">ai còn sống?</i></h1><p className="mt-7 max-w-xl text-base leading-8 text-[#b9c8b9] sm:text-lg">Tạo một ngôi làng, mời bạn bè và để luật chơi điều hành phần còn lại. Vai trò được giữ bí mật; những cuộc tranh luận vẫn thuộc về các bạn.</p><div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#c8d5c8]"><span>✦ Vai trò riêng tư</span><span>✦ Điều phối ngày & đêm</span><span>✦ Không cần quản trò</span></div></div><div className="rise grid gap-4 [animation-delay:120ms]"><form onSubmit={createGame} className="panel rounded-[2rem] p-6 sm:p-8"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.17em] text-[#e8ba61]">Bắt đầu</p><h2 className="display-font mt-1 text-3xl font-bold">Tạo ngôi làng</h2></div><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#e8ba61]/12 text-xl">🕯</span></div><p className="mt-3 text-sm leading-6 text-[#b7c5b7]">Mời mọi người vào phòng trước, rồi chủ phòng chọn thành phần role cho cả ván.</p><div className="mt-6"><Field label="Tên của bạn" value={hostName} onChange={setHostName} maxLength={40} placeholder="Ví dụ: An" /></div><button disabled={loading !== null} className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#e8ba61] px-5 py-3.5 font-extrabold text-[#122218] transition hover:bg-[#ffe2a1] disabled:opacity-50">{loading === "create" ? "Đang dựng ngôi làng…" : <>Tạo phòng <span>→</span></>}</button></form><form onSubmit={joinGame} className="soft-panel rounded-[2rem] p-6 sm:p-7"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5">✦</span><div><h2 className="display-font text-2xl font-bold">Vào phòng</h2><p className="text-xs text-[#a9b6a9]">Đã có lời mời từ bạn bè?</p></div></div><div className="mt-5 grid gap-3 sm:grid-cols-2"><Field label="Mã phòng" value={gameId} onChange={setGameId} placeholder="UUID phòng" /><Field label="Tên của bạn" value={joinName} onChange={setJoinName} maxLength={40} placeholder="Ví dụ: Bình" /></div><button disabled={loading !== null} className="mt-5 w-full rounded-2xl border border-[#e8ba61]/45 px-5 py-3 font-bold text-[#ffe2a1] transition hover:bg-[#e8ba61]/10 disabled:opacity-50">{loading === "join" ? "Đang vào phòng…" : "Vào ngôi làng"}</button></form></div></section>{error && <p role="alert" className="relative z-10 mb-5 rounded-2xl border border-red-300/30 bg-red-950/50 px-5 py-4 text-sm text-red-100">{error}</p>}</main>;
 }

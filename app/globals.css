@@ -1,7 +1,36 @@
 @import "tailwindcss";
 
-:root { --ink: #f8f6ee; --forest: #10261d; --moss: #1c4432; --gold: #eabf65; --muted: #afc3b6; }
+:root { --ink: #eef4e9; --muted: #a9b6a9; --forest-950: #07130f; --gold: #e8ba61; --gold-light: #ffe2a1; }
 * { box-sizing: border-box; }
-body { min-height: 100vh; margin: 0; background: radial-gradient(circle at top, #214d39 0, var(--forest) 44rem, #09150f 100%); color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+html { background: var(--forest-950); }
+body { min-height: 100vh; margin: 0; background: radial-gradient(circle at 15% -5%, rgba(91,137,96,.36), transparent 29rem), radial-gradient(circle at 90% 16%, rgba(208,166,80,.12), transparent 25rem), linear-gradient(160deg, #11291d 0%, var(--forest-950) 58%, #050d09 100%); color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .32; background-image: radial-gradient(rgba(255,255,255,.09) .55px, transparent .7px); background-size: 7px 7px; mask-image: linear-gradient(to bottom, black, transparent 80%); }
 button, input, select { font: inherit; }
 button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+::selection { background: rgba(232,186,97,.35); color: white; }
+.display-font { font-family: Georgia, "Times New Roman", serif; }
+.panel { border: 1px solid rgba(225,238,220,.12); background: linear-gradient(145deg, rgba(30,61,43,.82), rgba(8,23,16,.87)); box-shadow: 0 24px 70px rgba(0,0,0,.24); backdrop-filter: blur(18px); }
+.soft-panel { border: 1px solid rgba(225,238,220,.1); background: rgba(7,22,15,.46); backdrop-filter: blur(12px); }
+.gold-ring { box-shadow: 0 0 0 1px rgba(232,186,97,.24), 0 16px 42px rgba(0,0,0,.2); }
+.mist { animation: drift 14s ease-in-out infinite alternate; }
+.rise { animation: rise .45s ease-out both; }
+@keyframes drift { from { transform: translate3d(-1%,0,0); } to { transform: translate3d(2%,-1%,0); } }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* The game board owns its palette so a server phase update can crossfade night into day. */
+.game-scene { --scene-ink: #eef4e9; position: relative; isolation: isolate; color: var(--scene-ink); background: radial-gradient(circle at 15% -5%, rgba(91,137,96,.36), transparent 29rem), radial-gradient(circle at 90% 16%, rgba(208,166,80,.12), transparent 25rem), linear-gradient(160deg, #11291d 0%, var(--forest-950) 58%, #050d09 100%); transition: color .55s ease, background-color .7s ease; }
+.game-scene::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; background: radial-gradient(circle at 12% 0%, rgba(255,255,255,.94), transparent 25rem), radial-gradient(circle at 94% 8%, rgba(248,197,105,.42), transparent 24rem), linear-gradient(155deg, #dbe9dc 0%, #b8d3ba 47%, #85ad8c 100%); transition: opacity .7s ease; }
+.game-scene--day { --scene-ink: #1c3223; }
+.game-scene--day::before { opacity: 1; }
+.game-scene .panel, .game-scene .soft-panel, .game-scene [class*="bg-black/"], .game-scene [class*="bg-white/"], .game-scene [class*="bg-emerald"], .game-scene [class*="bg-red"], .game-scene [class*="bg-pink"], .game-scene [class*="bg-sky"], .game-scene [class*="bg-cyan"], .game-scene [class*="bg-fuchsia"], .game-scene [class*="bg-violet"] { transition: background-color .55s ease, border-color .55s ease, box-shadow .55s ease, color .45s ease; }
+.game-scene--day .panel { border-color: rgba(54,87,59,.23); background: linear-gradient(145deg, rgba(248,253,246,.86), rgba(220,237,220,.84)); box-shadow: 0 24px 70px rgba(29,66,35,.17); }
+.game-scene--day .soft-panel { border-color: rgba(54,87,59,.2); background: rgba(247,252,244,.7); box-shadow: 0 14px 36px rgba(29,66,35,.1); }
+.game-scene--day [class*="bg-black/"] { background-color: rgba(239,248,237,.7); }
+.game-scene--day [class*="bg-white/"] { background-color: rgba(255,255,255,.56); }
+.game-scene--day [class*="text-[#"], .game-scene--day [class*="text-white"], .game-scene--day [class*="text-emerald-"], .game-scene--day [class*="text-red-"], .game-scene--day [class*="text-pink-"], .game-scene--day [class*="text-sky-"], .game-scene--day [class*="text-cyan-"], .game-scene--day [class*="text-fuchsia-"], .game-scene--day [class*="text-violet-"] { color: #28442e; }
+.game-scene--day [class*="border-white/"], .game-scene--day [class*="border-emerald"], .game-scene--day [class*="border-red"], .game-scene--day [class*="border-pink"], .game-scene--day [class*="border-sky"], .game-scene--day [class*="border-cyan"], .game-scene--day [class*="border-fuchsia"], .game-scene--day [class*="border-violet"] { border-color: rgba(54,87,59,.22); }
+.game-scene--day .gold-ring { box-shadow: 0 0 0 1px rgba(148,103,35,.25), 0 16px 42px rgba(29,66,35,.14); }
+.role-fool { border-color: rgba(178,151,72,.3); background: rgba(146,121,49,.1); color: #c5b679; }
+.game-scene--day .role-fool { border-color: rgba(111,90,39,.26); background: rgba(192,170,88,.16); color: #65562d; }
+@media (prefers-reduced-motion: reduce) { .game-scene, .game-scene::before, .game-scene .panel, .game-scene .soft-panel, .game-scene [class] { transition-duration: .01ms !important; } }
