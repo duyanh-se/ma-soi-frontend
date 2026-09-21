@@ -15,6 +15,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   createGame: (hostName: string) => request<{ gameId: string; hostPlayerId: string }>("/games", { method: "POST", body: JSON.stringify({ hostName }) }),
   joinGame: (gameId: string, name: string) => request<{ playerId: string }>(`/games/${gameId}/join`, { method: "POST", body: JSON.stringify({ name }) }),
+  leaveGame: (gameId: string, playerId: string) => request<{ left: true }>(`/games/${gameId}/leave`, { method: "POST", body: JSON.stringify({ playerId }) }),
+  kickPlayer: (gameId: string, playerId: string, targetPlayerId: string) => request<GameView>(`/games/${gameId}/kick`, { method: "POST", body: JSON.stringify({ playerId, targetPlayerId }) }),
   configureRoles: (gameId: string, playerId: string, roles: Role[]) => request<GameView>(`/games/${gameId}/configuration`, { method: "POST", body: JSON.stringify({ playerId, roles }) }),
   startGame: (gameId: string, playerId: string) => request<GameView>(`/games/${gameId}/start`, { method: "POST", body: JSON.stringify({ playerId }) }),
   viewGame: (gameId: string, playerId: string) => request<GameView>(`/games/${gameId}/view?playerId=${encodeURIComponent(playerId)}`),
